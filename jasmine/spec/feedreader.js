@@ -104,19 +104,25 @@ $(function() {
          * by the loadFeed function that the content actually changes.
          * Remember, loadFeed() is asynchronous.
          */
+        var initialFirstEntry;
+        beforeEach(function(done){
+            loadFeed(1, function(){
+                initialFirstEntry = $('.entry').first().text();
+                loadFeed(2, done);
+            });
+        });
         afterEach(function(done){
             loadFeed(0, done);
         });
         it('changes the content, that is, the list of articles', function(done){
-            var initialFirstEntry, updatedFirstEntry;
-            loadFeed(1, function(){
-                initialFirstEntry = $('.entry').first().text();
-                loadFeed(2, function(){
-                    updatedFirstEntry = $('.entry').first().text();
-                    expect(updatedFirstEntry).not.toBe(initialFirstEntry);
-                    done();
-                });
-            });
+            var updatedFirstEntry;
+            expect(initialFirstEntry).toBeDefined();
+
+            updatedFirstEntry = $('.entry').first().text();
+            expect(updatedFirstEntry).toBeDefined();
+
+            expect(updatedFirstEntry).not.toBe(initialFirstEntry);
+            done();
         });
     });
 }());
