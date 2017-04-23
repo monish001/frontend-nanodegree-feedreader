@@ -63,7 +63,7 @@ $(function() {
          * hiding/showing of the menu element.
          */
         it('is hidden by default', function(){
-            expect(body.hasClass('menu-hidden')).toBe(true);
+            expect(body.hasClass('menu-hidden')).toBeTruthy();
         });
 
          /* Test that ensures the menu changes
@@ -73,9 +73,9 @@ $(function() {
           */
         it('changes visibility on click', function(){
             menuIcon.trigger('click');
-            expect(body.hasClass('menu-hidden')).toBe(false);
+            expect(body.hasClass('menu-hidden')).toBeFalsy();
             menuIcon.trigger('click');
-            expect(body.hasClass('menu-hidden')).toBe(true);
+            expect(body.hasClass('menu-hidden')).toBeTruthy();
         });
     });
 
@@ -89,9 +89,7 @@ $(function() {
          * the use of Jasmine's beforeEach and asynchronous done() function.
          */
         beforeEach(function(done){
-            setTimeout(function(){
-                done();
-            }, 4000); // expect initial feed to be rendered within 4 seconds
+            loadFeed(0, done);
         });
         it('loads at least a single entry within the feed container', function(done){
             expect(feedContainer.find('.entry').length).toBeGreaterThan(0);
@@ -106,15 +104,19 @@ $(function() {
          * by the loadFeed function that the content actually changes.
          * Remember, loadFeed() is asynchronous.
          */
-        var initialFirstEntry;
-        beforeEach(function(done){
-            initialFirstEntry = $('.entry').first().text();
-            loadFeed(1, done);
+        afterEach(function(done){
+            loadFeed(0, done);
         });
         it('changes the content, that is, the list of articles', function(done){
-            updatedFirstEntry = $('.entry').first().text();
-            expect(updatedFirstEntry).not.toBe(initialFirstEntry);
-            done();
+            var initialFirstEntry, updatedFirstEntry;
+            loadFeed(1, function(){
+                initialFirstEntry = $('.entry').first().text();
+                loadFeed(2, function(){
+                    updatedFirstEntry = $('.entry').first().text();
+                    expect(updatedFirstEntry).not.toBe(initialFirstEntry);
+                    done();
+                });
+            });
         });
     });
 }());
